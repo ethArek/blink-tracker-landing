@@ -17,7 +17,7 @@ async function loadManifest() {
 }
 
 function applyDownloads(manifest) {
-  const versionText = manifest?.latestVersion ?? "—";
+  const versionText = manifest?.latestVersion ?? " - ";
   const downloads = manifest?.downloads ?? {};
 
   for (const card of document.querySelectorAll("[data-downloads] .download-card")) {
@@ -35,11 +35,11 @@ function applyDownloads(manifest) {
       button.textContent = data?.label || button.textContent;
     }
 
-    const sha = data?.sha256 || "—";
+    const sha = data?.sha256 || " - ";
     if (shaEl) shaEl.textContent = sha;
 
     if (copyBtn) {
-      copyBtn.disabled = sha === "—";
+      copyBtn.disabled = sha === " - ";
       copyBtn.addEventListener("click", async () => {
         try {
           await navigator.clipboard.writeText(sha);

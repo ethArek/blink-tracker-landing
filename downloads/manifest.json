@@ -4,17 +4,17 @@
     "windows": {
       "label": "Download for Windows",
       "file": "./downloads/DryEyeBlink-Setup-Windows.exe",
-      "sha256": "—"
+      "sha256": " - "
     },
     "macos": {
       "label": "Download for macOS",
       "file": "./downloads/DryEyeBlink-macOS.dmg",
-      "sha256": "—"
+      "sha256": " - "
     },
     "linux": {
       "label": "Download for Linux",
       "file": "./downloads/DryEyeBlink-Linux.AppImage",
-      "sha256": "—"
+      "sha256": " - "
     }
   }
 }

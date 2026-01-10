@@ -4,9 +4,9 @@ This folder contains a lightweight, dependency-free landing page for the **Blink
 
 ## What’s included
 
-- `index.html`, `styles.css`, `main.js` — the landing page (hero, features, downloads, FAQ, privacy).
-- `downloads/manifest.json` — download link + checksum config (edit this per release).
-- `downloads/README.md` — where to put your installer files.
+- `index.html`, `styles.css`, `main.js` - the landing page (hero, features, downloads, FAQ, privacy).
+- `downloads/manifest.json` - download link + checksum config (edit this per release).
+- `downloads/README.md` - where to put your installer files.
 
 ## Add installers
 
