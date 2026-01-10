@@ -26,3 +26,7 @@ python -m http.server 5173
 ```
 
 Then visit `http://localhost:5173/`.
+
+## Deploy to GitHub Pages
+
+Pushes to `main` automatically deploy the static site via `.github/workflows/pages.yml`. The published URL will be the repository's GitHub Pages address (for example, `https://<user>.github.io/dry-eye-blink-landing/` unless a custom domain is configured).
