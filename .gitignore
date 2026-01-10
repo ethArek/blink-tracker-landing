@@ -1,0 +1,5 @@
+# release artifacts (keep the folder + manifest tracked)
+/downloads/*
+!/downloads/README.md
+!/downloads/manifest.json
+
