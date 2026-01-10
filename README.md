@@ -29,4 +29,13 @@ Then visit `http://localhost:5173/`.
 
 ## Deploy to GitHub Pages
 
-Pushes to `main` automatically deploy the static site via `.github/workflows/pages.yml`. The published URL will be the repository's GitHub Pages address (for example, `https://<user>.github.io/dry-eye-blink-landing/` unless a custom domain is configured).
+The site automatically deploys to GitHub Pages via `.github/workflows/pages.yml` when:
+- A PR is merged to the `main` branch
+- Changes are pushed directly to the `main` branch
+- Manual deployment is triggered from the Actions tab
+
+The published URL will be the repository's GitHub Pages address (for example, `https://<user>.github.io/blink-tracker-landing/` unless a custom domain is configured).
+
+### How it works
+
+When a PR is merged to `main`, GitHub creates a push event to the `main` branch, which triggers the deployment workflow. The workflow then builds and deploys the static site to GitHub Pages automatically.
