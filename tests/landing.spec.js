@@ -54,6 +54,18 @@ test.describe("mobile navigation", () => {
     await expect(navLinks).not.toHaveClass(/is-open/);
     await captureScreenshot(page, testInfo, "mobile-menu-closed");
   });
+
+  test("does not move focus to menu toggle when Escape is pressed and menu is closed", async ({ page }, testInfo) => {
+    await page.goto("/");
+    const toggle = page.getByRole("button", { name: "Toggle navigation menu" });
+    const cta = page.locator("[data-smart-download]");
+    await cta.focus();
+    await expect(cta).toBeFocused();
+    await page.keyboard.press("Escape");
+    await expect(toggle).toHaveAttribute("aria-expanded", "false");
+    await expect(cta).toBeFocused();
+    await captureScreenshot(page, testInfo, "mobile-menu-escape-closed");
+  });
 });
 
 for (const scenario of osScenarios) {
