@@ -21,7 +21,6 @@ This folder contains a lightweight, dependency-free landing page for the **Blink
 Open `index.html` in a browser (download buttons work), or run a tiny static server (recommended so `downloads/manifest.json` loads too):
 
 ```powershell
-cd dry-eye-blink-landing
 python -m http.server 5173
 ```
 
