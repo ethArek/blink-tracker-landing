@@ -3,3 +3,9 @@
 !/downloads/README.md
 !/downloads/manifest.json
 
+# javascript dependencies
+/node_modules/
+
+# playwright outputs
+/playwright-report/
+/test-results/

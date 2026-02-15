@@ -1,41 +1,70 @@
-# Blink Tracker: Dry Eye Helper Landing
+# Blink Tracker Landing
 
-This folder contains a lightweight, dependency-free landing page for the **Blink Tracker: Dry Eye Helper** desktop app.
+Landing site for the **Blink Tracker: Dry Eye Helper** desktop app.
 
-## What’s included
+The site itself is static (`index.html`, `styles.css`, `main.js`) and uses `downloads/manifest.json` to populate installer links and checksums.
 
-- `index.html`, `styles.css`, `main.js` - the landing page (hero, features, downloads, FAQ, privacy).
-- `downloads/manifest.json` - download link + checksum config (edit this per release).
-- `downloads/README.md` - where to put your installer files.
+## Current UX behavior
 
-## Add installers
+- Responsive layout with accessible mobile navigation.
+- Smart hero download CTA that auto-selects Windows/macOS/Linux when detected.
+- Download cards with version + SHA-256 sourced from `downloads/manifest.json`.
+- FAQ/privacy sections and story page (`stories.html`).
 
-1. Put your installer artifacts in `downloads/` (or upload them elsewhere and use absolute URLs).
-2. Edit `downloads/manifest.json` to set:
+## Project files
+
+- `index.html` - main landing page.
+- `stories.html` - story page.
+- `styles.css` - shared styling.
+- `main.js` - UI behavior, manifest loading, smart CTA, mobile menu interactions.
+- `downloads/manifest.json` - release version, installer links, SHA-256 values.
+- `tests/landing.spec.js` - Playwright end-to-end tests.
+- `tests/static-server.js` - local static server used by Playwright runs.
+- `playwright.config.js` - Playwright configuration.
+
+## Configure installers
+
+1. Place installer files in `downloads/` or use hosted absolute URLs.
+2. Update `downloads/manifest.json` fields:
    - `latestVersion`
-   - `downloads.windows|macos|linux.file` (URL or relative path)
+   - `downloads.windows.file`
+   - `downloads.macos.file`
+   - `downloads.linux.file`
    - `downloads.*.sha256`
 
-## Preview locally
+## Run locally
 
-Open `index.html` in a browser (download buttons work), or run a tiny static server (recommended so `downloads/manifest.json` loads too):
+Use a static server so manifest fetch requests work:
 
 ```powershell
-cd dry-eye-blink-landing
 python -m http.server 5173
 ```
 
-Then visit `http://localhost:5173/`.
+Open `http://localhost:5173/`.
 
-## Deploy to GitHub Pages
+## End-to-end tests
 
-The site automatically deploys to GitHub Pages via `.github/workflows/pages.yml` when:
-- A PR is merged to the `main` branch
-- Changes are pushed directly to the `main` branch
-- Manual deployment is triggered from the Actions tab
+Install test dependencies once:
 
-The published URL will be the repository's GitHub Pages address (for example, `https://<user>.github.io/blink-tracker-landing/` unless a custom domain is configured).
+```powershell
+npm install
+npx playwright install
+```
 
-### How it works
+Run tests:
 
-When a PR is merged to `main`, GitHub creates a push event to the `main` branch, which triggers the deployment workflow. The workflow then builds and deploys the static site to GitHub Pages automatically.
+```powershell
+npm run test:e2e
+```
+
+Additional modes:
+
+```powershell
+npm run test:e2e:headed
+npm run test:e2e:ui
+```
+
+## Test artifacts
+
+- Screenshots are written to `test-results/` (per-test output folders).
+- HTML report is written to `playwright-report/`.
