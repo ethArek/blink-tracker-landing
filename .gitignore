@@ -2,6 +2,10 @@
 /downloads/*
 !/downloads/README.md
 !/downloads/manifest.json
-node_modules
-playwright-report
-test-results
+
+# javascript dependencies
+/node_modules/
+
+# playwright outputs
+/playwright-report/
+/test-results/

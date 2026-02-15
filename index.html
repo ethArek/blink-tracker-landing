@@ -9,6 +9,12 @@
     />
     <title>Blink Tracker: Dry Eye Helper - Free blink tracker & gentle reminders</title>
     <link rel="icon" href="./favicon.svg" type="image/svg+xml" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&family=Space+Grotesk:wght@600;700&display=swap"
+    />
     <link rel="stylesheet" href="./styles.css" />
   </head>
   <body>
@@ -31,7 +37,7 @@
           </span>
         </a>
 
-        <div class="nav-links">
+        <div class="nav-links" id="primary-nav-links" data-nav-links>
           <a href="#features">Features</a>
           <a href="#how">How it works</a>
           <a href="#download">Download</a>
@@ -41,6 +47,17 @@
         </div>
 
         <div class="nav-actions">
+          <button
+            class="menu-toggle"
+            type="button"
+            data-nav-toggle
+            aria-expanded="false"
+            aria-controls="primary-nav-links"
+            aria-label="Toggle navigation menu"
+          >
+            <span>Menu</span>
+            <span class="menu-toggle-icon" aria-hidden="true"><span></span><span></span><span></span></span>
+          </button>
           <a class="button small primary" href="#download">Get it free</a>
         </div>
       </nav>
@@ -60,9 +77,10 @@
               without blinking - helpful for screen-heavy days and dry-eye prevention.
             </p>
             <div class="cta-row">
-              <a class="button primary" href="#download">Download</a>
+              <a class="button primary" href="#download" data-smart-download>Download</a>
               <a class="button ghost" href="#how">How it works</a>
             </div>
+            <p class="cta-note" data-smart-status>Auto-detecting your platform for one-click download.</p>
             <div class="mini-stats" role="list">
               <div class="mini-stat" role="listitem">
                 <div class="mini-stat-title">Live session stats</div>
