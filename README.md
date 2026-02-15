@@ -27,15 +27,26 @@ python -m http.server 5173
 
 Then visit `http://localhost:5173/`.
 
-## Deploy to GitHub Pages
+## End-to-end tests (Playwright)
 
-The site automatically deploys to GitHub Pages via `.github/workflows/pages.yml` when:
-- A PR is merged to the `main` branch
-- Changes are pushed directly to the `main` branch
-- Manual deployment is triggered from the Actions tab
+Install dependencies:
 
-The published URL will be the repository's GitHub Pages address (for example, `https://<user>.github.io/blink-tracker-landing/` unless a custom domain is configured).
+```powershell
+npm install
+npx playwright install
+```
 
-### How it works
+Run tests:
 
-When a PR is merged to `main`, GitHub creates a push event to the `main` branch, which triggers the deployment workflow. The workflow then builds and deploys the static site to GitHub Pages automatically.
+```powershell
+npm run test:e2e
+```
+
+Screenshots are generated for each test run under `test-results/` (per-test output folders).
+
+Optional modes:
+
+```powershell
+npm run test:e2e:headed
+npm run test:e2e:ui
+```

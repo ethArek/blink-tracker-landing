@@ -9,6 +9,12 @@
     />
     <title>Blink Tracker: Dry Eye Helper - Success story</title>
     <link rel="icon" href="./favicon.svg" type="image/svg+xml" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&family=Space+Grotesk:wght@600;700&display=swap"
+    />
     <link rel="stylesheet" href="./styles.css" />
   </head>
   <body>
@@ -31,7 +37,7 @@
           </span>
         </a>
 
-        <div class="nav-links">
+        <div class="nav-links" id="primary-nav-links" data-nav-links>
           <a href="./index.html#features">Features</a>
           <a href="./index.html#how">How it works</a>
           <a href="./index.html#download">Download</a>
@@ -40,6 +46,17 @@
         </div>
 
         <div class="nav-actions">
+          <button
+            class="menu-toggle"
+            type="button"
+            data-nav-toggle
+            aria-expanded="false"
+            aria-controls="primary-nav-links"
+            aria-label="Toggle navigation menu"
+          >
+            <span>Menu</span>
+            <span class="menu-toggle-icon" aria-hidden="true"><span></span><span></span><span></span></span>
+          </button>
           <a class="button small primary" href="./index.html#download"
             >Download</a
           >
