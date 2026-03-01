@@ -162,14 +162,27 @@ function setupMobileNavigation() {
   if (!(toggle instanceof HTMLButtonElement) || !(links instanceof HTMLElement)) {
     return;
   }
+
+  const setBodyNavState = (open) => {
+    if (open) {
+      document.body.dataset.navOpen = "true";
+      return;
+    }
+    document.body.dataset.navOpen = "false";
+  };
+
   const setOpen = (open) => {
     if (open) {
       links.classList.add("is-open");
       toggle.setAttribute("aria-expanded", "true");
+      toggle.dataset.navState = "open";
+      setBodyNavState(true);
       return;
     }
     links.classList.remove("is-open");
     toggle.setAttribute("aria-expanded", "false");
+    toggle.dataset.navState = "closed";
+    setBodyNavState(false);
   };
 
   setOpen(false);
@@ -218,6 +231,98 @@ function setupMobileNavigation() {
   }
 }
 
+function setupScrollProgress() {
+  const progressBar = document.querySelector("[data-scroll-progress]");
+  if (!(progressBar instanceof HTMLElement)) {
+    return;
+  }
+  const updateProgress = () => {
+    const scrollTop = window.scrollY || window.pageYOffset;
+    const scrollableHeight = document.documentElement.scrollHeight - window.innerHeight;
+    if (scrollableHeight <= 0) {
+      progressBar.style.setProperty("--scroll-progress", "0");
+      return;
+    }
+    const ratio = Math.min(Math.max(scrollTop / scrollableHeight, 0), 1);
+    progressBar.style.setProperty("--scroll-progress", ratio.toFixed(4));
+  };
+
+  updateProgress();
+  window.addEventListener("scroll", updateProgress, { passive: true });
+  window.addEventListener("resize", updateProgress);
+}
+
+function setupSectionNavigationState() {
+  const navLinks = Array.from(document.querySelectorAll("[data-nav-links] a[href^=\"#\"]"));
+  if (!navLinks.length) {
+    return;
+  }
+
+  const linksBySectionId = new Map();
+  for (const link of navLinks) {
+    const href = link.getAttribute("href");
+    if (!href || href.length < 2) {
+      continue;
+    }
+    linksBySectionId.set(href.slice(1), link);
+  }
+  if (!linksBySectionId.size) {
+    return;
+  }
+
+  const setActiveSection = (sectionId) => {
+    for (const [id, link] of linksBySectionId) {
+      if (id === sectionId) {
+        link.classList.add("is-active");
+        link.setAttribute("aria-current", "location");
+      } else {
+        link.classList.remove("is-active");
+        link.removeAttribute("aria-current");
+      }
+    }
+  };
+  const hashId = window.location.hash.replace("#", "");
+  if (linksBySectionId.has(hashId)) {
+    setActiveSection(hashId);
+  }
+  if (!("IntersectionObserver" in window)) {
+    return;
+  }
+
+  const sections = [];
+  for (const id of linksBySectionId.keys()) {
+    const section = document.getElementById(id);
+    if (section instanceof HTMLElement) {
+      sections.push(section);
+    }
+  }
+  if (!sections.length) {
+    return;
+  }
+  const observer = new IntersectionObserver(
+    (entries) => {
+      let chosenSection = null;
+      for (const entry of entries) {
+        if (entry.isIntersecting) {
+          if (!chosenSection || entry.intersectionRatio > chosenSection.intersectionRatio) {
+            chosenSection = entry;
+          }
+        }
+      }
+      if (chosenSection?.target?.id) {
+        setActiveSection(chosenSection.target.id);
+      }
+    },
+    {
+      threshold: [0.2, 0.35, 0.6],
+      rootMargin: "-18% 0px -55% 0px",
+    }
+  );
+  for (const section of sections) {
+    observer.observe(section);
+  }
+}
+
 function setupRevealAnimations() {
   const items = document.querySelectorAll(".hero-card, .mini-stat, .card, .download-card, .privacy-card, .faq details");
   if (!items.length) {
@@ -256,7 +361,9 @@ function setupRevealAnimations() {
 }
 
 async function main() {
+  setupScrollProgress();
   setupMobileNavigation();
+  setupSectionNavigationState();
   setupRevealAnimations();
   const hasDownloadUi = document.querySelector("[data-downloads], [data-smart-download]") !== null;
   if (!hasDownloadUi) {

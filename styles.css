@@ -24,7 +24,7 @@
 
 html,
 body {
-  height: 100%;
+  min-height: 100%;
 }
 
 html {
@@ -34,10 +34,10 @@ html {
 body {
   margin: 0;
   background:
-    radial-gradient(1400px 700px at 15% 0%, rgba(96, 165, 250, 0.16), transparent 60%),
-    radial-gradient(1100px 600px at 85% 10%, rgba(34, 197, 94, 0.14), transparent 55%),
-    radial-gradient(900px 450px at 50% 95%, rgba(245, 158, 11, 0.1), transparent 55%),
-    var(--bg);
+    radial-gradient(1200px 620px at 10% -10%, rgba(96, 165, 250, 0.14), transparent 70%),
+    radial-gradient(1040px 620px at 90% 4%, rgba(34, 197, 94, 0.12), transparent 72%),
+    radial-gradient(1000px 580px at 50% 120%, rgba(96, 165, 250, 0.07), transparent 76%),
+    linear-gradient(180deg, #0b1222 0%, #08101b 40%, var(--bg) 100%);
   color: var(--text);
   font-family: var(--font-body);
   line-height: 1.55;
@@ -86,6 +86,18 @@ section[id] {
 
 .skip-link:focus {
   left: 12px;
+}
+
+.scroll-progress {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 3px;
+  z-index: 120;
+  transform-origin: left center;
+  transform: scaleX(var(--scroll-progress, 0));
+  background: linear-gradient(90deg, var(--accent), var(--accent-2));
 }
 
 .site-header {
@@ -177,6 +189,13 @@ section[id] {
   color: var(--text);
 }
 
+.nav-links a.is-active,
+.nav-links a[aria-current="location"],
+.nav-links a[aria-current="page"] {
+  color: var(--text);
+  background: color-mix(in oklab, var(--accent) 28%, transparent);
+}
+
 .nav-actions {
   display: inline-flex;
   align-items: center;
@@ -209,6 +228,19 @@ section[id] {
   height: 2px;
   border-radius: 10px;
   background: var(--text);
+  transition: transform 140ms ease, opacity 140ms ease;
+}
+
+.menu-toggle[data-nav-state="open"] .menu-toggle-icon span:nth-child(1) {
+  transform: translateY(5px) rotate(45deg);
+}
+
+.menu-toggle[data-nav-state="open"] .menu-toggle-icon span:nth-child(2) {
+  opacity: 0;
+}
+
+.menu-toggle[data-nav-state="open"] .menu-toggle-icon span:nth-child(3) {
+  transform: translateY(-5px) rotate(-45deg);
 }
 
 .button {
@@ -323,6 +355,31 @@ h1 {
 
 [data-smart-status][data-ready="true"] {
   color: color-mix(in oklab, var(--accent) 60%, var(--text));
+}
+
+.trust-strip {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.trust-item {
+  display: grid;
+  gap: 2px;
+  padding: 12px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  background: color-mix(in oklab, var(--panel) 84%, transparent);
+}
+
+.trust-item strong {
+  font-size: 13px;
+}
+
+.trust-item span {
+  font-size: 12px;
+  color: var(--muted);
 }
 
 .mini-stats {
@@ -876,6 +933,9 @@ details[open] summary::after {
   .hero-grid {
     grid-template-columns: 1fr;
   }
+  .trust-strip {
+    grid-template-columns: 1fr;
+  }
   .mini-stats {
     grid-template-columns: 1fr;
   }
@@ -894,6 +954,10 @@ details[open] summary::after {
 }
 
 @media (max-width: 680px) {
+  body[data-nav-open="true"] {
+    overflow: hidden;
+  }
+
   .container {
     width: min(var(--max), calc(100% - 24px));
   }
@@ -928,7 +992,9 @@ details[open] summary::after {
   .card,
   .download-card,
   .reveal-item,
-  .eye-anim .lid {
+  .eye-anim .lid,
+  .menu-toggle-icon span,
+  .scroll-progress {
     transition: none;
     animation: none;
   }
