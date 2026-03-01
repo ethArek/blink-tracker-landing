@@ -29,7 +29,9 @@ function toFilePath(requestUrl) {
     pathname = "/index.html";
   }
   const resolvedPath = path.resolve(ROOT_DIR, `.${pathname}`);
-  if (!resolvedPath.startsWith(ROOT_DIR)) {
+  const relativePath = path.relative(ROOT_DIR, resolvedPath);
+  const isOutsideRoot = relativePath === ".." || relativePath.startsWith(`..${path.sep}`);
+  if (isOutsideRoot || path.isAbsolute(relativePath)) {
     return null;
   }
 

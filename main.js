@@ -51,6 +51,31 @@ function getDownloadForOS(manifest, os) {
   return downloads[os] ?? null;
 }
 
+function getSafeDownloadHref(file) {
+  if (typeof file !== "string") {
+    return null;
+  }
+  const trimmedFile = file.trim();
+  if (!trimmedFile) {
+    return null;
+  }
+
+  try {
+    const normalizedUrl = new URL(trimmedFile, window.location.href);
+    const isSameOrigin = normalizedUrl.origin === window.location.origin;
+    if (isSameOrigin) {
+      return trimmedFile;
+    }
+    if (normalizedUrl.protocol === "https:") {
+      return normalizedUrl.href;
+    }
+
+    return null;
+  } catch {
+    return null;
+  }
+}
+
 function applyDownloads(manifest) {
   const versionText = manifest?.latestVersion ?? " - ";
   const downloads = manifest?.downloads ?? {};
@@ -67,8 +92,9 @@ function applyDownloads(manifest) {
       version.textContent = versionText;
     }
 
-    if (data?.file && button) {
-      button.href = data.file;
+    const downloadHref = getSafeDownloadHref(data?.file);
+    if (downloadHref && button instanceof HTMLAnchorElement) {
+      button.setAttribute("href", downloadHref);
       button.textContent = data?.label || button.textContent;
     }
 
@@ -112,7 +138,8 @@ function applySmartDownload(manifest, os) {
     return;
   }
   const data = getDownloadForOS(manifest, os);
-  if (!data?.file) {
+  const downloadHref = getSafeDownloadHref(data?.file);
+  if (!downloadHref) {
     if (status instanceof HTMLElement) {
       status.textContent = "Choose your installer below.";
       status.dataset.ready = "false";
@@ -120,7 +147,7 @@ function applySmartDownload(manifest, os) {
 
     return;
   }
-  button.href = data.file;
+  button.setAttribute("href", downloadHref);
   button.textContent = data?.label || `Download for ${getOsLabel(os)}`;
   button.dataset.smartReady = "true";
   if (status instanceof HTMLElement) {
@@ -231,6 +258,10 @@ function setupRevealAnimations() {
 async function main() {
   setupMobileNavigation();
   setupRevealAnimations();
+  const hasDownloadUi = document.querySelector("[data-downloads], [data-smart-download]") !== null;
+  if (!hasDownloadUi) {
+    return;
+  }
   const os = detectOS();
   const manifest = await loadManifest();
   highlightRecommended(os);
