@@ -1,7 +1,21 @@
 document.documentElement.classList.add("js-ready");
 
+function isMobileDevice(ua) {
+  if (!ua) {
+    return false;
+  }
+  if (/(Android|iPhone|iPad|iPod|Windows Phone|Mobile)/i.test(ua)) {
+    return true;
+  }
+
+  return false;
+}
+
 function detectOS() {
   const ua = navigator.userAgent || "";
+  if (isMobileDevice(ua)) {
+    return null;
+  }
   if (/Windows/i.test(ua)) {
     return "windows";
   }

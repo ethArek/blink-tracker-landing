@@ -19,6 +19,21 @@ const osScenarios = [
   },
 ];
 
+const mobileScenarios = [
+  {
+    name: "android",
+    userAgent:
+      "Mozilla/5.0 (Linux; Android 14; Pixel 8) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Mobile Safari/537.36",
+    hasTouch: true,
+  },
+  {
+    name: "ipad",
+    userAgent:
+      "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15) AppleWebKit/605.1.15 (KHTML, like Gecko) Version/17.4 Mobile/15E148 Safari/604.1",
+    hasTouch: true,
+  },
+];
+
 async function captureScreenshot(page, testInfo, name) {
   await page.screenshot({
     path: testInfo.outputPath(`${name}.png`),
@@ -85,6 +100,29 @@ for (const scenario of osScenarios) {
       const recommendedCard = page.locator(`[data-downloads] .download-card[data-os="${scenario.name}"]`);
       await expect(recommendedCard).toHaveClass(/is-recommended/);
       await captureScreenshot(page, testInfo, `${scenario.name}-smart-download`);
+    });
+  });
+}
+
+for (const scenario of mobileScenarios) {
+  test.describe(`${scenario.name} mobile download fallback`, () => {
+    test.use({
+      userAgent: scenario.userAgent,
+      hasTouch: scenario.hasTouch,
+      viewport: { width: 390, height: 844 },
+    });
+
+    test("does not auto-select a desktop installer", async ({ page }, testInfo) => {
+      await page.goto("/");
+      const smartButton = page.locator("[data-smart-download]");
+      const status = page.locator("[data-smart-status]");
+      const recommendedCards = page.locator("[data-downloads] .download-card.is-recommended");
+      await expect(smartButton).toHaveAttribute("href", "#download");
+      await expect(smartButton).toHaveText("Download");
+      await expect(status).toHaveAttribute("data-ready", "false");
+      await expect(status).toHaveText("Choose your installer below.");
+      await expect(recommendedCards).toHaveCount(0);
+      await captureScreenshot(page, testInfo, `${scenario.name}-download-fallback`);
     });
   });
 }
