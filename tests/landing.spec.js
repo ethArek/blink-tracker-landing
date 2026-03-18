@@ -41,6 +41,18 @@ async function captureScreenshot(page, testInfo, name) {
   });
 }
 
+async function expectUnavailableDownloadCard(page, os, versionText) {
+  const card = page.locator(`[data-downloads] .download-card[data-os="${os}"]`);
+  const button = card.locator("[data-download-button]");
+  const copyButton = card.locator("[data-copy-sha]");
+  await expect(card).toHaveAttribute("data-available", "false");
+  await expect(button).toHaveAttribute("aria-disabled", "true");
+  await expect(card.locator("[data-version]")).toHaveText(versionText);
+  await expect(card.locator("[data-sha]")).toHaveText(" - ");
+  await expect(copyButton).toBeDisabled();
+  expect(await button.getAttribute("href")).toBeNull();
+}
+
 test("renders key landing content and version from manifest", async ({ page }, testInfo) => {
   await page.goto("/");
   await expect(page.getByRole("heading", { level: 1, name: "Blink more. Feel better." })).toBeVisible();
@@ -48,6 +60,70 @@ test("renders key landing content and version from manifest", async ({ page }, t
   await expect(versions).toHaveCount(3);
   await expect(versions.first()).toHaveText(manifest.latestVersion);
   await captureScreenshot(page, testInfo, "landing-overview");
+});
+
+test.describe("manifest edge cases", () => {
+  test("falls back gracefully when the manifest request fails", async ({ page }, testInfo) => {
+    await page.route("**/downloads/manifest.json", async (route) => {
+      await route.fulfill({
+        status: 500,
+        contentType: "application/json",
+        body: "{}",
+      });
+    });
+    await page.goto("/");
+    const smartButton = page.locator("[data-smart-download]");
+    const status = page.locator("[data-smart-status]");
+    await expect(smartButton).toHaveAttribute("href", "#download");
+    await expect(smartButton).toHaveText("Download");
+    await expect(status).toHaveAttribute("data-ready", "false");
+    await expect(status).toHaveText("Choose your installer below.");
+    await expect(page.locator("[data-downloads] .download-card.is-recommended")).toHaveCount(0);
+    await expectUnavailableDownloadCard(page, "windows", " - ");
+    await expectUnavailableDownloadCard(page, "macos", " - ");
+    await expectUnavailableDownloadCard(page, "linux", " - ");
+    await captureScreenshot(page, testInfo, "manifest-request-failed");
+  });
+
+  test.describe("with windows user agent", () => {
+    test.use({
+      userAgent: osScenarios[0].userAgent,
+    });
+
+    test("does not recommend or auto-select an invalid platform entry", async ({ page }, testInfo) => {
+      const brokenManifest = {
+        ...manifest,
+        downloads: {
+          ...manifest.downloads,
+          windows: {
+            ...manifest.downloads.windows,
+            file: "http://downloads.example.com/DryEyeBlink-Setup-Windows.exe",
+          },
+        },
+      };
+      await page.route("**/downloads/manifest.json", async (route) => {
+        await route.fulfill({
+          status: 200,
+          contentType: "application/json",
+          body: JSON.stringify(brokenManifest),
+        });
+      });
+      await page.goto("/");
+      const smartButton = page.locator("[data-smart-download]");
+      const status = page.locator("[data-smart-status]");
+      await expect(smartButton).toHaveAttribute("href", "#download");
+      await expect(smartButton).toHaveText("Download");
+      await expect(status).toHaveAttribute("data-ready", "false");
+      await expect(status).toHaveText("Choose your installer below.");
+      await expect(page.locator("[data-downloads] .download-card.is-recommended")).toHaveCount(0);
+      await expectUnavailableDownloadCard(page, "windows", manifest.latestVersion);
+      const linuxCard = page.locator('[data-downloads] .download-card[data-os="linux"]');
+      const linuxButton = linuxCard.locator("[data-download-button]");
+      await expect(linuxCard).toHaveAttribute("data-available", "true");
+      await expect(linuxButton).toHaveAttribute("href", manifest.downloads.linux.file);
+      await captureScreenshot(page, testInfo, "windows-invalid-platform-entry");
+    });
+  });
 });
 
 test.describe("mobile navigation", () => {

@@ -90,6 +90,29 @@ function getSafeDownloadHref(file) {
   }
 }
 
+function setDownloadButtonState(button, options) {
+  if (!(button instanceof HTMLAnchorElement)) {
+    return;
+  }
+  if (!button.dataset.defaultLabel) {
+    button.dataset.defaultLabel = button.textContent.trim();
+  }
+  const href = options?.href ?? null;
+  if (href) {
+    button.setAttribute("href", href);
+    button.textContent = options?.label || button.dataset.defaultLabel;
+    button.dataset.available = "true";
+    button.removeAttribute("aria-disabled");
+    button.removeAttribute("tabindex");
+    return;
+  }
+  button.removeAttribute("href");
+  button.textContent = options?.fallbackLabel || "Unavailable";
+  button.dataset.available = "false";
+  button.setAttribute("aria-disabled", "true");
+  button.setAttribute("tabindex", "-1");
+}
+
 function applyDownloads(manifest) {
   const versionText = manifest?.latestVersion ?? " - ";
   const downloads = manifest?.downloads ?? {};
@@ -107,9 +130,17 @@ function applyDownloads(manifest) {
     }
 
     const downloadHref = getSafeDownloadHref(data?.file);
-    if (downloadHref && button instanceof HTMLAnchorElement) {
-      button.setAttribute("href", downloadHref);
-      button.textContent = data?.label || button.textContent;
+    if (downloadHref) {
+      card.dataset.available = "true";
+      setDownloadButtonState(button, {
+        href: downloadHref,
+        label: data?.label,
+      });
+    } else {
+      card.dataset.available = "false";
+      setDownloadButtonState(button, {
+        fallbackLabel: "Installer unavailable",
+      });
     }
 
     const sha = data?.sha256 || " - ";
@@ -133,8 +164,13 @@ function applyDownloads(manifest) {
   }
 }
 
-function highlightRecommended(os) {
+function highlightRecommended(manifest, os) {
   if (!os) {
+    return;
+  }
+  const data = getDownloadForOS(manifest, os);
+  const downloadHref = getSafeDownloadHref(data?.file);
+  if (!downloadHref) {
     return;
   }
   const card = document.querySelector(`[data-downloads] .download-card[data-os="${os}"]`);
@@ -151,9 +187,17 @@ function applySmartDownload(manifest, os) {
   if (!(button instanceof HTMLAnchorElement)) {
     return;
   }
+  if (!button.dataset.defaultLabel) {
+    button.dataset.defaultLabel = button.textContent.trim();
+  }
   const data = getDownloadForOS(manifest, os);
   const downloadHref = getSafeDownloadHref(data?.file);
   if (!downloadHref) {
+    button.setAttribute("href", "#download");
+    button.textContent = button.dataset.defaultLabel;
+    button.dataset.smartReady = "false";
+    button.removeAttribute("aria-disabled");
+    button.removeAttribute("tabindex");
     if (status instanceof HTMLElement) {
       status.textContent = "Choose your installer below.";
       status.dataset.ready = "false";
@@ -385,8 +429,8 @@ async function main() {
   }
   const os = detectOS();
   const manifest = await loadManifest();
-  highlightRecommended(os);
   applyDownloads(manifest);
+  highlightRecommended(manifest, os);
   applySmartDownload(manifest, os);
 }
 

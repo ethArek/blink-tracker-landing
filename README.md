@@ -55,7 +55,7 @@ After deployment, the site is available at the repository's GitHub Pages URL.
 
 1. A change lands on `master` (direct push or merged PR).
 2. GitHub Actions runs the `Deploy to GitHub Pages` workflow.
-3. The workflow uploads the repository root as a Pages artifact.
+3. The workflow stages the static site files into a dedicated Pages artifact.
 4. GitHub Pages publishes the new version.
 
 ## End-to-end tests
